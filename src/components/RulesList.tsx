@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import RuleCard from './RuleCard';
 import AddRuleForm from './AddRuleForm';
+import EditRuleForm from './EditRuleForm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { Rule } from '@/hooks/useRules';
@@ -21,6 +22,7 @@ const RulesList = ({ showOnlyMyRules = false, initialFramework = 'All', initialL
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingRule, setEditingRule] = useState<string | null>(null);
   const [selectedFramework, setSelectedFramework] = useState(initialFramework);
   const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
   const [page, setPage] = useState(1);
@@ -131,15 +133,32 @@ const RulesList = ({ showOnlyMyRules = false, initialFramework = 'All', initialL
 
   const handleRuleCreated = () => {
     setShowAddForm(false);
+    setEditingRule(null);
     fetchRules(1, true);
     fetchFilterOptions();
   };
+
+  const handleEdit = (ruleId: string) => {
+    setEditingRule(ruleId);
+  };
+
+  const editingRuleData = editingRule ? rules.find(r => r.id === editingRule) : null;
 
   if (showAddForm) {
     return (
       <AddRuleForm 
         onSuccess={handleRuleCreated}
         onCancel={() => setShowAddForm(false)}
+      />
+    );
+  }
+
+  if (editingRule && editingRuleData) {
+    return (
+      <EditRuleForm
+        rule={editingRuleData}
+        onSuccess={handleRuleCreated}
+        onCancel={() => setEditingRule(null)}
       />
     );
   }
@@ -245,7 +264,10 @@ const RulesList = ({ showOnlyMyRules = false, initialFramework = 'All', initialL
                 downloads={rule.downloads || 0}
                 copies={rule.copies || 0}
                 tags={rule.tags || []}
+                user_id={rule.user_id}
+                is_public={rule.is_public}
                 showMyRulesActions={showOnlyMyRules}
+                onEdit={handleEdit}
                 onUpdate={() => fetchRules(1, true)}
               />
             ))}

@@ -18,7 +18,10 @@ interface RuleCardProps {
   downloads: number;
   copies: number;
   tags: string[];
+  user_id?: string;
+  is_public?: boolean;
   showMyRulesActions?: boolean;
+  onEdit?: (id: string) => void;
   onUpdate?: () => void;
 }
 
@@ -31,7 +34,10 @@ const RuleCard = ({
   downloads, 
   copies, 
   tags,
+  user_id,
+  is_public = true,
   showMyRulesActions = false,
+  onEdit,
   onUpdate 
 }: RuleCardProps) => {
   const { copyRule, downloadRule } = useRules();
@@ -129,23 +135,20 @@ ${data.content}`;
     }
   };
 
+  const handleEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onEdit?.(id);
+  };
+
   const toggleVisibility = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
     try {
-      // First get current visibility
-      const { data: currentRule } = await supabase
-        .from('rules')
-        .select('is_public')
-        .eq('id', id)
-        .single();
-
-      if (!currentRule) return;
-
       const { error } = await supabase
         .from('rules')
-        .update({ is_public: !currentRule.is_public })
+        .update({ is_public: !is_public })
         .eq('id', id);
 
       if (error) {
@@ -154,13 +157,15 @@ ${data.content}`;
         return;
       }
 
-      toast.success(`Rule is now ${!currentRule.is_public ? 'public' : 'private'}`);
+      toast.success(`Rule is now ${!is_public ? 'public' : 'private'}`);
       onUpdate?.();
     } catch (error) {
       console.error('Error updating visibility:', error);
       toast.error('Failed to update visibility');
     }
   };
+
+  const isOwner = user && user_id === user.id;
 
   return (
     <div 
@@ -175,6 +180,11 @@ ${data.content}`;
             <span className="text-sm font-medium text-purple-400">{framework}</span>
             <span className="text-xs text-slate-500">•</span>
             <span className="text-xs text-slate-400">{language}</span>
+            {!is_public && isOwner && (
+              <span className="text-xs font-medium text-slate-400 bg-slate-600/50 px-2 py-1 rounded-full">
+                Private
+              </span>
+            )}
           </div>
           <Link to={`/rules/${id}`}>
             <h3 className="text-xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors line-clamp-2">
@@ -208,7 +218,7 @@ ${data.content}`;
         </div>
         
         <div className={`flex items-center space-x-2 transition-opacity ${showActions || showMyRulesActions ? 'opacity-100' : 'opacity-0'}`}>
-          {showMyRulesActions ? (
+          {showMyRulesActions && isOwner ? (
             <>
               <Button
                 size="sm"
@@ -217,17 +227,12 @@ ${data.content}`;
                 className="p-2 text-slate-400 hover:text-white hover:bg-slate-700"
                 title="Toggle visibility"
               >
-                <Eye className="h-4 w-4" />
+                {is_public ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
               </Button>
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  // TODO: Implement edit functionality
-                  toast.info('Edit functionality coming soon!');
-                }}
+                onClick={handleEdit}
                 className="p-2 text-slate-400 hover:text-white hover:bg-slate-700"
                 title="Edit rule"
               >

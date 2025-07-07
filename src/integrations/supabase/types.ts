@@ -36,6 +36,54 @@ export type Database = {
         }
         Relationships: []
       }
+      prompts: {
+        Row: {
+          category: string
+          content: string
+          copies: number | null
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean | null
+          likes: number | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+          views: number | null
+        }
+        Insert: {
+          category: string
+          content: string
+          copies?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          likes?: number | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+          views?: number | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          copies?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          likes?: number | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          views?: number | null
+        }
+        Relationships: []
+      }
       rules: {
         Row: {
           always_apply: boolean | null

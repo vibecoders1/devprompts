@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import Prompts from "./pages/Prompts";
 import Rules from "./pages/Rules";
 import MyRules from "./pages/MyRules";
+import MyPrompts from "./pages/MyPrompts";
 import Tools from "./pages/Tools";
 import PromptDetail from "./pages/PromptDetail";
 import RuleDetail from "./pages/RuleDetail";
@@ -32,6 +33,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/prompts" element={<Prompts />} />
               <Route path="/prompts/:id" element={<PromptDetail />} />
+              <Route path="/my-prompts" element={<MyPrompts />} />
               <Route path="/rules" element={<Rules />} />
               <Route path="/rules/:id" element={<RuleDetail />} />
               <Route path="/my-rules" element={<MyRules />} />
